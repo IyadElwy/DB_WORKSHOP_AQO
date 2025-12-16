@@ -9,7 +9,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-USER $NB_UID
+# Create python symlink in multiple locations to ensure it's found
+RUN ln -sf /opt/conda/bin/python3 /opt/conda/bin/python && \
+    ln -sf /opt/conda/bin/python3 /usr/bin/python && \
+    ln -sf /opt/conda/bin/python3 /usr/local/bin/python
 
 # Install Python packages
 RUN pip install --no-cache-dir \
@@ -33,7 +36,6 @@ RUN mkdir -p /opt/spark/jars && \
     curl -O https://repo1.maven.org/maven2/io/delta/delta-storage/2.4.0/delta-storage-2.4.0.jar
 
 # Configure Spark defaults
-USER root
 RUN echo "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension" >> /usr/local/spark/conf/spark-defaults.conf && \
     echo "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog" >> /usr/local/spark/conf/spark-defaults.conf && \
     echo "spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem" >> /usr/local/spark/conf/spark-defaults.conf && \
@@ -48,10 +50,12 @@ RUN echo "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension" >> /usr/
     echo "spark.executor.memory=2g" >> /usr/local/spark/conf/spark-defaults.conf && \
     echo "spark.driver.memory=2g" >> /usr/local/spark/conf/spark-defaults.conf
 
-USER $NB_UID
-
 # Create work directories
-RUN mkdir -p /home/jovyan/work /home/jovyan/data
+RUN mkdir -p /home/jovyan/work /home/jovyan/data && \
+    chown -R jovyan:users /home/jovyan/work /home/jovyan/data
+
+# Switch back to jovyan user
+USER jovyan
 
 # Set working directory
 WORKDIR /home/jovyan/work

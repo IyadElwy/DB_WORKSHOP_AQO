@@ -52,12 +52,12 @@ services:
     networks:
       - lakehouse-network
     user: root
-    command: >
-      bash -c "
-      chown -R jovyan:users /home/jovyan/work &&
-      chown -R jovyan:users /home/jovyan/data &&
-      su jovyan -c 'start-notebook.sh --NotebookApp.token=\"\" --NotebookApp.password=\"\"'
-      "
+    # command: >
+    #   bash -c "
+    #   chown -R jovyan:users /home/jovyan/work &&
+    #   chown -R jovyan:users /home/jovyan/data &&
+    #   su jovyan -c 'start-notebook.sh --NotebookApp.token=\"\" --NotebookApp.password=\"\"'
+    #   "
 
   # Hive Metastore (Optional - for Delta Lake Catalog)
   hive-metastore:
