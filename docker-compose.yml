@@ -72,8 +72,6 @@ services:
       - hive-metastore-data:/opt/hive/data/warehouse
     networks:
       - lakehouse-network
-    profiles:
-      - full  # Optional service, enable with: docker-compose --profile full up
 
 volumes:
   minio-data:
